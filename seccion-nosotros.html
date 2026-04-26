@@ -94,19 +94,15 @@
             z-index: 5;
         }
 
-        /* --- FILAS TEMÁTICAS NETFLIX --- */
         .content-sections { padding: 0 4% 60px 4%; margin-top: -80px; position: relative; z-index: 20; }
-        
         .row { margin-bottom: 40px; }
         .row-title { font-size: 1.4rem; font-weight: bold; margin-bottom: 15px; color: var(--text-gray); }
-        
         .carousel { 
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 15px;
         }
         
-        /* Tarjetas Personalizadas */
         .card-container {
             position: relative; width: 100%; aspect-ratio: 16/9;
             border-radius: 4px; overflow: hidden; cursor: pointer;
@@ -144,7 +140,7 @@
 <body>
 
     <video id="video-principal" preload="auto">
-        <source src="https://drive.google.com/file/d/1fn5kqfCjPExRk8AvvtWU-9DrDPCMRnTb/view?usp=drive_link" type="video/mp4">
+        <source src="https://drive.google.com/uc?export=download&id=1fn5kqfCjPExRk8AvvtWU-9DrDPCMRnTb" type="video/mp4">
     </video>
     <button id="btn-cerrar-video" onclick="cerrarVideo()">✕</button>
 
@@ -154,7 +150,7 @@
 
     <section class="hero">
         <video class="video-bg" id="video-trailer" autoplay muted loop playsinline preload="auto">
-            <source src="https://drive.google.com/file/d/1DTyMrFGOXxrpMDY7wtx4jO35ees4pEi_/view?usp=drive_link" type="video/mp4">
+            <source src="https://drive.google.com/uc?export=download&id=1DTyMrFGOXxrpMDY7wtx4jO35ees4pEi_" type="video/mp4">
         </video>
 
         <div class="hero-content">
@@ -175,7 +171,6 @@
     </section>
 
     <main class="content-sections">
-        
         <div class="row">
             <div class="row-title">Mi Lista: Momentos Inolvidables</div>
             <div class="carousel">
@@ -222,7 +217,6 @@
                 </div>
             </div>
         </div>
-
     </main>
 
     <script>
