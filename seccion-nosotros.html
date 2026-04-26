@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix - Nuestra Historia</title>
+    <link rel="shortcut icon" href="https://assets.nflxext.com/us/ffe/siteui/common/icons/nficon2016.ico">
+    <style>
+        :root {
+            --netflix-red: #E50914;
+            --bg-black: #141414;
+            --text-white: #FFFFFF;
+            --text-gray: #e5e5e5;
+            --netflix-transition: transform 0.4s cubic-bezier(0.5, 0, 0.1, 1), box-shadow 0.4s ease, filter 0.4s ease;
+        }
+
+        body, html { 
+            margin: 0; padding: 0; 
+            background: var(--bg-black); 
+            color: var(--text-white); 
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            transition: opacity 0.5s ease;
+        }
+
+        header {
+            position: fixed; top: 0; width: 100%; height: 60px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, transparent 100%);
+            z-index: 1000; display: flex; align-items: center; padding: 0 4%;
+            box-sizing: border-box;
+        }
+        .header-logo { width: 90px; cursor: pointer; transition: transform 0.3s ease; }
+
+        #video-principal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: contain; background: black; z-index: 2000;
+            display: none;
+        }
+        #btn-cerrar-video {
+            position: fixed; top: 20px; right: 20px; z-index: 2001;
+            background: rgba(0,0,0,0.6); color: white; border: 1px solid white;
+            font-size: 1.5rem; cursor: pointer; display: none; 
+            border-radius: 50%; width: 45px; height: 45px;
+        }
+
+        .hero { 
+            position: relative; width: 100%; height: 75vh; 
+            display: flex; align-items: center; padding: 0 4%; 
+            box-sizing: border-box; overflow: hidden;
+            background-color: black;
+        }
+        
+        .video-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; z-index: 1; 
+            filter: brightness(0.6);
+            pointer-events: none; 
+        }
+
+        .hero-content { 
+            position: relative;
+            max-width: 600px; 
+            z-index: 10; 
+            margin-top: 30px; 
+            animation: fadeIn 1.2s ease-out; 
+        }
+
+        h1 { font-size: clamp(2rem, 6vw, 4rem); margin: 0; line-height: 1.1; font-weight: 700; text-shadow: 2px 2px 10px rgba(0,0,0,0.8);}
+        .meta-data { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 0.9rem; font-weight: bold; }
+        .match { color: #46d369; }
+        .age { border: 1px solid rgba(255,255,255,0.4); padding: 0 6px; font-size: 0.7rem; }
+        .description { 
+            font-size: clamp(0.85rem, 1.8vw, 1.1rem); 
+            line-height: 1.4; margin: 15px 0 20px 0; 
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
+            color: var(--text-gray);
+        }
+
+        .buttons-container { display: flex; gap: 12px; }
+        .btn-play, .btn-list {
+            padding: 8px 25px; font-size: 1rem; font-weight: bold; 
+            border-radius: 4px; cursor: pointer; display: flex; 
+            align-items: center; gap: 10px; border: none; transition: all 0.2s ease;
+        }
+        .btn-play { background: white; color: black; }
+        .btn-play:hover { background: rgba(255,255,255,0.75); transform: scale(1.05); }
+        .btn-list { background: rgba(109, 109, 110, 0.7); color: white; }
+        .btn-list:hover { background: rgba(109, 109, 110, 0.4); }
+
+        .hero-fade {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 25vh;
+            background: linear-gradient(to top, var(--bg-black), transparent);
+            z-index: 5;
+        }
+
+        /* --- FILAS TEMÁTICAS NETFLIX --- */
+        .content-sections { padding: 0 4% 60px 4%; margin-top: -80px; position: relative; z-index: 20; }
+        
+        .row { margin-bottom: 40px; }
+        .row-title { font-size: 1.4rem; font-weight: bold; margin-bottom: 15px; color: var(--text-gray); }
+        
+        .carousel { 
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+        
+        /* Tarjetas Personalizadas */
+        .card-container {
+            position: relative; width: 100%; aspect-ratio: 16/9;
+            border-radius: 4px; overflow: hidden; cursor: pointer;
+            transition: var(--netflix-transition);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            background: #2a2a2a;
+            display: flex; align-items: flex-end;
+        }
+
+        .card-img { position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+        
+        .card-overlay {
+            position: relative; z-index: 2; width: 100%; padding: 15px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+
+        .card-container:hover {
+            transform: scale(1.1) translateY(-10px);
+            z-index: 100; box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+        }
+        .card-container:hover .card-overlay { opacity: 1; }
+
+        .card-title { font-weight: bold; font-size: 0.9rem; margin-bottom: 4px; }
+        .card-sub { font-size: 0.7rem; color: #46d369; font-weight: bold; }
+
+        @media (max-width: 600px) {
+            .carousel { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .hero { height: 60vh; }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <video id="video-principal" preload="auto">
+        <source src="videos/2.mp4" type="video/mp4">
+    </video>
+    <button id="btn-cerrar-video" onclick="cerrarVideo()">✕</button>
+
+    <header>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix" class="header-logo" onclick="window.location.href='index.html'">
+    </header>
+
+    <section class="hero">
+        <video class="video-bg" id="video-trailer" autoplay muted loop playsinline preload="auto">
+            <source src="videos/1.mp4" type="video/mp4">
+        </video>
+
+        <div class="hero-content">
+            <div class="meta-data">
+                <span class="match">99% de coincidencia</span>
+                <span class="year">2024</span>
+                <span class="age">A+</span>
+                <span>Amor Real</span>
+            </div>
+            <h1>Nuestra Historia</h1>
+            <p class="description">Una aventura original de Yanira y Sergio. Momentos inolvidables que merecen ser vistos una y otra vez.</p>
+            <div class="buttons-container">
+                <button class="btn-play" onclick="reproducirPelicula()">▶ Reproducir</button>
+                <button class="btn-list" onclick="irAGaleria()">+ Ver Galería</button>
+            </div>
+        </div>
+        <div class="hero-fade"></div>
+    </section>
+
+    <main class="content-sections">
+        
+        <div class="row">
+            <div class="row-title">Mi Lista: Momentos Inolvidables</div>
+            <div class="carousel">
+                <div class="card-container" onclick="irAGaleria()">
+                    <img src="fotos/Sergio y Yani/1.jpg" class="card-img">
+                    <div class="card-overlay">
+                        <div class="card-title">El día que empezó todo</div>
+                        <div class="card-sub">98% de coincidencia</div>
+                    </div>
+                </div>
+                <div class="card-container" onclick="irAGaleria()">
+                    <img src="fotos/Sergio y Yani/2.jpg" class="card-img">
+                    <div class="card-overlay">
+                        <div class="card-title">Nuestra primera cena</div>
+                        <div class="card-sub">Aclamada por la crítica</div>
+                    </div>
+                </div>
+                <div class="card-container" onclick="irAGaleria()">
+                    <img src="fotos/Sergio y Yani/3.jpg" class="card-img">
+                    <div class="card-overlay">
+                        <div class="card-title">Escapadas épicas</div>
+                        <div class="card-sub">Top 1 en nuestro ranking</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="row-title">Próximos Estrenos: Planes 2024-2025</div>
+            <div class="carousel">
+                <div class="card-container" onclick="irAGaleria()">
+                    <img src="fotos/Sergio y Yani/4.jpg" class="card-img">
+                    <div class="card-overlay">
+                        <div class="card-title">Viaje sorpresa</div>
+                        <div class="card-sub">Muy pronto</div>
+                    </div>
+                </div>
+                <div class="card-container" onclick="irAGaleria()">
+                    <img src="fotos/Sergio y Yani/5.jpg" class="card-img">
+                    <div class="card-overlay">
+                        <div class="card-title">Nuestra nueva casa</div>
+                        <div class="card-sub">Próximamente en pantalla</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const vPrincipal = document.getElementById('video-principal');
+        const vTrailer = document.getElementById('video-trailer');
+        const btnCerrar = document.getElementById('btn-cerrar-video');
+
+        window.addEventListener('load', () => {
+            vTrailer.play().catch(error => { console.log("Autoplay bloqueado"); });
+        });
+
+        function reproducirPelicula() {
+            vTrailer.pause();
+            vPrincipal.style.display = 'block';
+            btnCerrar.style.display = 'block';
+            vPrincipal.play();
+        }
+
+        function cerrarVideo() {
+            vPrincipal.pause();
+            vPrincipal.currentTime = 0;
+            vPrincipal.style.display = 'none';
+            btnCerrar.style.display = 'none';
+            vTrailer.play();
+        }
+
+        function irAGaleria() {
+            document.body.style.opacity = "0";
+            setTimeout(() => { window.location.href = 'fotos.html'; }, 500);
+        }
+    </script>
+</body>
+</html>
